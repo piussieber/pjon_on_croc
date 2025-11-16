@@ -6,6 +6,7 @@ package:
   name: croc_soc
   authors:
     - "Philippe Sauter <phsauter@iis.ee.ethz.ch>"
+    - "Pius Sieber <pisieber@student.ethz.ch>"
 
 dependencies:
   # IMPORTANT: see vendor_package at the bottom
@@ -18,7 +19,9 @@ dependencies:
   timer_unit:           { git: "https://github.com/pulp-platform/timer_unit.git",           version: 1.0.3  }
   obi:                  { git: "https://github.com/pulp-platform/obi.git",                  version: 0.1.7  }
   obi_peripherals:      { git: "https://github.com/pulp-platform/obi_peripherals.git",      rev: 21ee04d    } # UART
+  pjon_hw:              { git: "https://github.com/piussieber/PJON_HW.git",                 rev: "pjon_addressing"}
   cve2:                 { path: "rtl/cve2" } # a vendor package (no Bender.yml), see below 
+  idma:                 { git: "git@gitlab.ethz.ch:pjon-on-croc/idma_axis_obi",             rev: "main"      }
 
 
 sources:
@@ -44,6 +47,12 @@ sources:
       - rtl/gpio/gpio.sv
       # Level 2
       - rtl/croc_domain.sv
+      - rtl/user_domain/pjon_hw/pjdl_idma_midend.sv
+      - rtl/user_domain/pjon_hw/pjdl_wrap.sv
+      - rtl/user_domain/pjon_hw/pjdl_idma_wrap.sv
+      - rtl/user_domain/pjon_hw/idma_obi_1d_frontend.sv
+      - rtl/user_domain/user_rom.sv
+      - rtl/user_domain/pjon_hw/obi_interface_adapter.sv
       - rtl/user_domain.sv
       # add your design files with modules here
       # Level 3
@@ -67,6 +76,12 @@ sources:
     files:
       - xilinx/hw/croc_xilinx.sv
       - xilinx/hw/fan_ctrl.sv
+
+  - target: vivado
+    defines:
+      COMMON_CELLS_ASSERTS_OFF: ~
+    files:
+      - rtl/croc_xilinx.sv
 
 vendor_package:
   #################################

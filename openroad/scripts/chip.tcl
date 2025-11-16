@@ -49,8 +49,8 @@ report_checks -format end -no_line_splits                >> ${report_dir}/${log_
 report_checks -format end -no_line_splits                >> ${report_dir}/${log_id_str}_${proj_name}_checks.rpt
 
 # Size of the chip
-set chipW            1760.0
-set chipH            1760.0
+set chipW            2017.0 
+set chipH            2017.0
 
 # thickness of annular ring for pads (length of a pad)
 set padRing           180.0
@@ -311,7 +311,7 @@ set_thread_count 8
 detailed_route -output_drc ${report_dir}/${log_id_str}_${proj_name}_route_drc.rpt \
                -bottom_routing_layer Metal2 \
                -top_routing_layer TopMetal1 \
-               -droute_end_iter 30 \
+               -droute_end_iter 50 \
                -drc_report_iter_step 5 \
                -save_guide_updates \
                -clean_patches \
@@ -350,10 +350,10 @@ write_sdc                      out/${proj_name}.sdc
 
 ## WARNING: Currently the extract_parasitics command removes metal patches (eg for min area)
 ## So if you want to use it, do so at the very end after writing out the def and odb files
-# define_process_corner -ext_model_index 0 X
-# extract_parasitics -ext_model_file IHP_rcx_patterns.rules
-# write_spef out/${proj_name}.spef
-# read_spef  out/${proj_name}.spef; # readback parasitics for OpenSTA
-# report_metrics "${log_id_str}_${proj_name}.extract"
+#define_process_corner -ext_model_index 0 X
+#extract_parasitics -ext_model_file IHP_rcx_patterns.rules
+#write_spef out/${proj_name}.spef
+#read_spef  out/${proj_name}.spef; # readback parasitics for OpenSTA
+#report_metrics "${log_id_str}_${proj_name}.extract"
 
 exit

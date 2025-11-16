@@ -6,6 +6,22 @@ packages:
       Path: rtl/apb
     dependencies:
     - common_cells
+  axi:
+    revision: 78831b6feba265d5ee2683bbf42b4150f8a35c43
+    version: 0.39.8
+    source:
+      Git: https://github.com/pulp-platform/axi.git
+    dependencies:
+    - common_cells
+    - common_verification
+    - tech_cells_generic
+  axi_stream:
+    revision: 54891ff40455ca94a37641b9da4604647878cc07
+    version: 0.1.1
+    source:
+      Git: https://github.com/pulp-platform/axi_stream.git
+    dependencies:
+    - common_cells
   common_cells:
     revision: null
     version: null
@@ -26,6 +42,18 @@ packages:
     source:
       Path: rtl/cve2
     dependencies: []
+  idma:
+    revision: 62e5e4fb7296a2ad021d9a45f93fdae416f93cdb
+    version: null
+    source:
+      Git: git@gitlab.ethz.ch:pjon-on-croc/idma_axis_obi
+    dependencies:
+    - axi
+    - axi_stream
+    - common_cells
+    - common_verification
+    - obi
+    - register_interface
   obi:
     revision: null
     version: null
@@ -42,6 +70,15 @@ packages:
     dependencies:
     - common_cells
     - obi
+  pjon_hw:
+    revision: 84abcd22735792b9c10b69fa9e88a7ac77589078
+    version: null
+    source:
+      Git: https://github.com/piussieber/PJON_HW.git
+    dependencies:
+    - axi_stream
+    - common_cells
+    - common_verification
   register_interface:
     revision: null
     version: null

@@ -12,7 +12,7 @@ ENTRY(_start)
 
 MEMORY 
 {
-   SRAM (rwxail) : ORIGIN = 0x10000000, LENGTH = 4K
+   SRAM (rwxail) : ORIGIN = 0x10000000, LENGTH = 16K /* 8k for Layer 3 to run, 2k for original Croc*/
 }
 
 SECTIONS

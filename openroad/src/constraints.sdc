@@ -29,11 +29,11 @@ set_driving_cell [all_inputs] -lib_cell sg13g2_IOPadOut16mA -pin pad
 ##################
 puts "Clocks..."
 
-# We target 80 MHz
+# We target 80 MHz (12.5 ns))
 set TCK_SYS 12.5
 create_clock -name clk_sys -period $TCK_SYS [get_ports clk_i]
 
-set TCK_JTG 20.0
+set TCK_JTG 25.0
 create_clock -name clk_jtg -period $TCK_JTG [get_ports jtag_tck_i]
 
 set TCK_RTC 50.0
@@ -112,6 +112,16 @@ set_input_delay  -max -add_delay -clock clk_sys [ expr $TCK_SYS * 0.30 ] [get_po
 
 set_output_delay -min -add_delay -clock clk_sys [ expr $TCK_SYS * 0.10 ] [get_ports {status_o gpio*}]
 set_output_delay -max -add_delay -clock clk_sys [ expr $TCK_SYS * 0.30 ] [get_ports {status_o gpio*}]
+
+
+##########
+## PJON ##
+##########
+set_input_delay  -min -add_delay -clock clk_sys [ expr $TCK_SYS * 0.10 ] [get_ports {pjon_en_single_wire_i pjon_i_direct_i pjon_single_wire_io}]
+set_input_delay  -max -add_delay -clock clk_sys [ expr $TCK_SYS * 0.30 ] [get_ports {pjon_en_single_wire_i pjon_i_direct_i pjon_single_wire_io}]
+
+set_output_delay -min -add_delay -clock clk_sys [ expr $TCK_SYS * 0.10 ] [get_ports {pjon_en_o pjon_o_direct_o pjon_single_wire_io}]
+set_output_delay -max -add_delay -clock clk_sys [ expr $TCK_SYS * 0.30 ] [get_ports {pjon_en_o pjon_o_direct_o pjon_single_wire_io}]
 
 
 ##########

@@ -43,8 +43,8 @@ make_io_sites -horizontal_site sg13g2_ioSite \
 set padD    180; # pad depth (edge to core)
 set padW     80; # pad width (beachfront)
 
-set chipH  1760; # left/right (height)
-set chipW  1760; # top/bottom (width)
+set chipH  2017.0; # left/right (height)
+set chipW  2017.0; # top/bottom (width)
 
 #Edge: LEFT (top to bottom)
 set numPads 16
@@ -124,22 +124,22 @@ set offset 20
 set pitch [expr {floor( ($chipW - 2*$padD -2*$offset - $padW)/($numPads-1) )}]
 puts "IO_NORTH_pitch: $pitch "
 set start [expr $chipW - $padD - $padW -$offset]
-place_pad -row IO_NORTH  -location [expr $start -  0*$pitch] "pad_vssio3"          ; # pin no:  1
-place_pad -row IO_NORTH  -location [expr $start -  1*$pitch] "pad_vddio3"          ; # pin no:  2
-place_pad -row IO_NORTH  -location [expr $start -  2*$pitch] "pad_gpio24_io"       ; # pin no:  3
-place_pad -row IO_NORTH  -location [expr $start -  3*$pitch] "pad_gpio25_io"       ; # pin no:  4
-place_pad -row IO_NORTH  -location [expr $start -  4*$pitch] "pad_gpio26_io"       ; # pin no:  5
-place_pad -row IO_NORTH  -location [expr $start -  5*$pitch] "pad_gpio27_io"       ; # pin no:  6
-place_pad -row IO_NORTH  -location [expr $start -  6*$pitch] "pad_gpio28_io"       ; # pin no:  7
-place_pad -row IO_NORTH  -location [expr $start -  7*$pitch] "pad_gpio29_io"       ; # pin no:  8
-place_pad -row IO_NORTH  -location [expr $start -  8*$pitch] "pad_gpio30_io"       ; # pin no:  9
-place_pad -row IO_NORTH  -location [expr $start -  9*$pitch] "pad_gpio31_io"       ; # pin no: 10
-place_pad -row IO_NORTH  -location [expr $start - 10*$pitch] "pad_unused0_o"       ; # pin no: 11
-place_pad -row IO_NORTH  -location [expr $start - 11*$pitch] "pad_unused1_o"       ; # pin no: 12
-place_pad -row IO_NORTH  -location [expr $start - 12*$pitch] "pad_unused2_o"       ; # pin no: 13
-place_pad -row IO_NORTH  -location [expr $start - 13*$pitch] "pad_unused3_o"       ; # pin no: 14
-place_pad -row IO_NORTH  -location [expr $start - 14*$pitch] "pad_vss3"            ; # pin no: 15
-place_pad -row IO_NORTH  -location [expr $start - 15*$pitch] "pad_vdd3"            ; # pin no: 16
+place_pad -row IO_NORTH  -location [expr $start -  0*$pitch] "pad_vssio3"                       ; # pin no:  1
+place_pad -row IO_NORTH  -location [expr $start -  1*$pitch] "pad_vddio3"                       ; # pin no:  2
+place_pad -row IO_NORTH  -location [expr $start -  2*$pitch] "pad_gpio24_io"                    ; # pin no:  3
+place_pad -row IO_NORTH  -location [expr $start -  3*$pitch] "pad_gpio25_io"                    ; # pin no:  4
+place_pad -row IO_NORTH  -location [expr $start -  4*$pitch] "pad_gpio26_io"                    ; # pin no:  5
+place_pad -row IO_NORTH  -location [expr $start -  5*$pitch] "pad_gpio27_io"                    ; # pin no:  6
+place_pad -row IO_NORTH  -location [expr $start -  6*$pitch] "pad_gpio28_io"                    ; # pin no:  7
+place_pad -row IO_NORTH  -location [expr $start -  7*$pitch] "pad_gpio29_io"                    ; # pin no:  8
+place_pad -row IO_NORTH  -location [expr $start -  8*$pitch] "pad_gpio30_io"                    ; # pin no:  9
+place_pad -row IO_NORTH  -location [expr $start -  9*$pitch] "pad_pjon_o_direct_o"              ; # pin no: 10
+place_pad -row IO_NORTH  -location [expr $start - 10*$pitch] "pad_pjon_i_direct_i"              ; # pin no: 11
+place_pad -row IO_NORTH  -location [expr $start - 11*$pitch] "pad_pjon_single_wire_io"          ; # pin no: 12
+place_pad -row IO_NORTH  -location [expr $start - 12*$pitch] "pad_pjon_en_o"                    ; # pin no: 13
+place_pad -row IO_NORTH  -location [expr $start - 13*$pitch] "pad_pjon_en_single_wire_i"        ; # pin no: 14
+place_pad -row IO_NORTH  -location [expr $start - 14*$pitch] "pad_vss3"                         ; # pin no: 15
+place_pad -row IO_NORTH  -location [expr $start - 15*$pitch] "pad_vdd3"                         ; # pin no: 16
 
 place_corners $iocorner
 

@@ -21,8 +21,11 @@ set abc_script [processAbcScript scripts/abc-opt.script]
 # read liberty files and prepare some variables
 source scripts/init_tech.tcl
 
+# Enable the SystemVerilog frontend plugin
 yosys plugin -i slang.so
+
 # default from yosys_common.tcl: top_design=croc_chip; sv_flist=../croc.flist
+# allows us to load SystemVerilog files
 yosys read_slang --top $top_design -F $sv_flist \
         --compat-mode --keep-hierarchy \
         --allow-use-before-declare --ignore-unknown-modules
@@ -34,6 +37,11 @@ yosys read_slang --top $top_design -F $sv_flist \
 yosys setattr -set keep_hierarchy 1 "t:croc_soc$*"
 yosys setattr -set keep_hierarchy 1 "t:croc_domain$*"
 yosys setattr -set keep_hierarchy 1 "t:user_domain$*"
+
+yosys setattr -set keep_hierarchy 1 "t:pjdl_wrap$*" 
+yosys setattr -set keep_hierarchy 1 "t:pjdl$*"
+yosys setattr -set keep_hierarchy 1 "t:idma_backend_rw_axis_rw_obi$*"
+
 yosys setattr -set keep_hierarchy 1 "t:core_wrap$*"
 yosys setattr -set keep_hierarchy 1 "t:cve2_register_file_ff$*"
 yosys setattr -set keep_hierarchy 1 "t:cve2_cs_registers$*"
@@ -61,6 +69,11 @@ yosys attrmvcp -copy -attr keep
 # -----------------------------------------------------------------------------
 # this section heavily borrows from the yosys synth command:
 # synth - check
+#
+# Elaboration transforms the HDL design into an intermediate representation, resolving 
+# the design hierarchy and instantiating all the modules. This step ensures that all 
+# components are in place before optimization can begin.
+
 yosys hierarchy -top $top_design
 yosys check
 yosys proc

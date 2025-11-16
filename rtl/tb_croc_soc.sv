@@ -8,8 +8,8 @@
 `define TRACE_WAVE
 
 module tb_croc_soc #(
-    parameter time         ClkPeriod     = 50ns,
-    parameter time         ClkPeriodJtag = 50ns,
+    parameter time         ClkPeriod     = 12.5ns, // 80MHz, with 100Mhz the UART communication currently dosn't work for some reason
+    parameter time         ClkPeriodJtag = 12.5ns,
     parameter time         ClkPeriodRef  = 30518ns,
     parameter time         TAppl         = 0.2*ClkPeriod,
     parameter time         TTest         = 0.8*ClkPeriod,
@@ -18,8 +18,13 @@ module tb_croc_soc #(
     parameter int unsigned  UartBaudRate      = 115200,
     parameter int unsigned  UartParityEna     = 0,
 
-    localparam int unsigned ClkFrequency = 1s / ClkPeriod
+    localparam int unsigned ClkFrequency = 1s / ClkPeriod,
+
+    // PJON
+    parameter int unsigned PjdlMode = 1
 )();
+    typedef bit [ 7:0] byte_bt;
+
     logic clk;
     logic rst_n;
     logic ref_clk;
@@ -41,6 +46,9 @@ module tb_croc_soc #(
     logic [GpioCount-1:0] gpio_i;             
     logic [GpioCount-1:0] gpio_o;            
     logic [GpioCount-1:0] gpio_out_en_o;
+
+    logic pjon_in;
+    logic pjon_out;
 
     // Register addresses
     localparam bit [31:0] BootAddrAddr   = croc_pkg::SocCtrlAddrOffset
@@ -298,12 +306,10 @@ module tb_croc_soc #(
         $finish();
     endtask
 
-
     ////////////
     //  UART  //
     ////////////
 
-    typedef bit [ 7:0] byte_bt;
     localparam int unsigned UartDivisior = ClkFrequency / (UartBaudRate*16);
     localparam UartRealBaudRate = ClkFrequency / (UartDivisior*16);
     localparam time UartBaudPeriod = 1s/UartRealBaudRate;
@@ -382,7 +388,7 @@ module tb_croc_soc #(
                     
                     $display("@%t | [UART] %s", $time, uart_str);
                     uart_read_buf.push_back(bite);
-                    $display("@%t | [UART] raw: %p", $time, uart_read_buf);
+                    //$display("@%t | [UART] raw: %p", $time, uart_read_buf);
   
                 end else begin
                     $display("@%t | [UART] ???", $time);
@@ -396,6 +402,11 @@ module tb_croc_soc #(
     end
 
 
+    //////////////
+    //  PJON    //
+    //////////////
+
+    `include "pjdl_tb_tasks.svh"
 
     ////////////
     //  DUT   //
@@ -425,10 +436,17 @@ module tb_croc_soc #(
 
         .gpio_i        ( gpio_i        ),             
         .gpio_o        ( gpio_o        ),            
-        .gpio_out_en_o ( gpio_out_en_o )
+        .gpio_out_en_o ( gpio_out_en_o ),
+
+        .pjon_hw_o     ( pjon_out     ),
+        .pjon_hw_i     ( pjon_in      ),
+        .pjon_hw_en_o  (              )
     );
 
-    assign gpio_i[ 3:0]          = '0;
+    //assign gpio_i[0]            = pjon_in;
+    //assign pjon_out             = gpio_o[1]; = 
+
+    assign gpio_i[ 3:1]          = '0;
     assign gpio_i[ 7:4]          = gpio_out_en_o[3:0] & gpio_o[3:0]; // loop back
     assign gpio_i[GpioCount-1:8] = '0;
 
@@ -438,6 +456,7 @@ module tb_croc_soc #(
     /////////////////
 
     logic [31:0] tb_data;
+    logic receive_ack_now;
 
     initial begin
         $timeformat(-9, 0, "ns", 12); // 1: scale (ns=-9), 2: decimals, 3: suffix, 4: print-field width
@@ -448,6 +467,7 @@ module tb_croc_soc #(
         `endif
 
         fetch_en_i = 1'b0;
+        receive_ack_now = 1'b0;
         
         // wait for reset
         #ClkPeriod;
@@ -469,6 +489,47 @@ module tb_croc_soc #(
         // resume core
         jtag_resume();
 
+        // receive data over PJON
+        $display("@%t | [PJON-Test] waiting to receive data", $time);
+
+        pjdl_receive_frame(receive_value, PjdlMode);
+
+        pjdl_receive_frame(receive_value, PjdlMode);
+        @(negedge pjon_out);
+        pjdl_send_byte(8'h06, PjdlMode); // ACK
+
+        // PJON Test-Packet
+        pjon_in = 1'b0;
+        #3ms
+        $display("@%t | [PJON-Test] send packet to dut...", $time);
+        pjdl_send_preamble();
+        pjdl_frame_init(PjdlMode);
+        pjdl_send_byte(8'h01, PjdlMode); // Receiver-ID
+        pjdl_send_byte(8'h04, PjdlMode); // HEADER-Bitmap
+        pjdl_send_byte(8'h06, PjdlMode); // Length
+        pjdl_send_byte(8'hED, PjdlMode); // CRC
+        pjdl_send_byte(8'h42, PjdlMode); // Data: "B"
+        pjdl_send_byte(8'hFF, PjdlMode); // CRC
+        $display("@%t | [PJON-Test] packet sent", $time);
+        receive_ack_now = 1'b1;
+        pjdl_send_ack_request(PjdlMode);
+        
+        receive_ack_now = 1'b0;
+        #2ms
+
+        $display("@%t | [PJON-Test] send second packet to dut...", $time);
+        pjdl_send_preamble();
+        pjdl_frame_init(PjdlMode);
+        pjdl_send_byte(8'h01, PjdlMode); // Receiver-ID
+        pjdl_send_byte(8'h04, PjdlMode); // HEADER-Bitmap
+        pjdl_send_byte(8'h06, PjdlMode); // Length
+        pjdl_send_byte(8'hED, PjdlMode); // CRC
+        pjdl_send_byte(8'h42, PjdlMode); // Data: "B"
+        pjdl_send_byte(8'hFF, PjdlMode); // CRC
+        $display("@%t | [PJON-Test] packet sent", $time);
+        receive_ack_now = 1'b1;
+        pjdl_send_ack_request(PjdlMode);
+        
         // wait for non-zero return value (written into core status register)
         $display("@%t | [CORE] Wait for end of code...", $time);
         jtag_wait_for_eoc(tb_data);
@@ -479,6 +540,15 @@ module tb_croc_soc #(
         $dumpflush;
         `endif
         $finish();
+    end
+
+    byte_bt ack_receive_value;
+    initial begin
+        #(2ms);
+        @(posedge receive_ack_now)
+        pjdl_receive_ack(PjdlMode, .receive_value(ack_receive_value));
+        @(posedge receive_ack_now)
+        pjdl_receive_ack(PjdlMode, .receive_value(ack_receive_value));
     end
 
 endmodule

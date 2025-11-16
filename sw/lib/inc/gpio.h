@@ -38,6 +38,7 @@ uint32_t gpio_get_interrupt_status(void);
 // functions applying to only one GPIO pin
 // LSB is considered GPIO number 0
 void gpio_pin_set_output(uint8_t gpio_pin);
+void gpio_pin_set_input(uint8_t gpio_pin);
 void gpio_pin_enable(uint8_t gpio_pin);
 void gpio_pin_disable(uint8_t gpio_pin);
 

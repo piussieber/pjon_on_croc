@@ -30,6 +30,18 @@ set sram {\[0\].i_sram/}
 set bank0_sram0 $SRAM$sram$SRAM_512x32
 set sram {\[1\].i_sram/}
 set bank1_sram0 $SRAM$sram$SRAM_512x32
+set sram {\[2\].i_sram/}
+set bank2_sram0 $SRAM$sram$SRAM_512x32
+set sram {\[3\].i_sram/}
+set bank3_sram0 $SRAM$sram$SRAM_512x32
+set sram {\[4\].i_sram/}
+set bank4_sram0 $SRAM$sram$SRAM_512x32
+set sram {\[5\].i_sram/}
+set bank5_sram0 $SRAM$sram$SRAM_512x32
+set sram {\[6\].i_sram/}
+set bank6_sram0 $SRAM$sram$SRAM_512x32
+set sram {\[7\].i_sram/}
+set bank7_sram0 $SRAM$sram$SRAM_512x32
 
 set JTAG_ASYNC_REQ [get_nets $JTAG/i_dmi_cdc.i_cdc_req/*async_*]
 set JTAG_ASYNC_RSP [get_nets $JTAG/i_dmi_cdc.i_cdc_resp/*async_*]

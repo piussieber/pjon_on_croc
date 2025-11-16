@@ -24,8 +24,9 @@ RISCV_AR      ?= $(RISCV_PREFIX)ar
 RISCV_LD      ?= $(RISCV_PREFIX)ld
 RISCV_STRIP   ?= $(RISCV_PREFIX)strip
 
-RISCV_FLAGS    ?= -march=$(RISCV_MARCH) -mabi=$(RISCV_MABI) -mcmodel=medany -static -std=gnu99 -Os -nostdlib -fno-builtin -ffreestanding
-RISCV_CCFLAGS  ?= $(RISCV_FLAGS) -Iinclude -I$(INCDIR) -I$(CURDIR)
+RISCV_FLAGS    ?= -march=$(RISCV_MARCH) -mabi=$(RISCV_MABI) -mcmodel=medany -static  -Os -nostdlib -fno-builtin -ffreestanding
+RISCV_CCFLAGS  ?= $(RISCV_FLAGS) -Iinclude -I$(INCDIR) -I$(CURDIR) -std=gnu99
+RISCV_CXXFLAGS  ?= $(RISCV_FLAGS) -Iinclude -I$(INCDIR) -I$(CURDIR) -std=c++11
 RISCV_LDFLAGS  ?= -static -nostartfiles -lm -lgcc $(RISCV_FLAGS)
 
 # all
@@ -38,11 +39,11 @@ BINDIR 	?= bin
 CRT0 	?= crt0.S
 LINK 	?= link.ld
 
-LIB_SOURCES := $(wildcard $(SRCDIR)/*.[cS])
+LIB_SOURCES := $(wildcard $(SRCDIR)/*.[cS] $(SRCDIR)/*.cpp)
 LIB_OBJS    := $(LIB_SOURCES:$(SRCDIR)/%=$(SRCDIR)/%.o)
 
 # Build all assembly and C files in the top level as seperate binaries
-TOP_SOURCES ?= $(filter-out $(CRT0), $(wildcard *.[cS]))
+TOP_SOURCES ?= $(filter-out $(CRT0), $(wildcard *.[cS] *.cpp) )
 TOP_BASENAMES := $(basename $(TOP_SOURCES))
 TOP_OBJS    := $(TOP_BASENAMES:=.o)
 ALL_TARGETS := $(TOP_BASENAMES:%=$(BINDIR)/%.elf) $(TOP_BASENAMES:%=$(BINDIR)/%.dump) $(TOP_BASENAMES:%=$(BINDIR)/%.hex)
@@ -57,11 +58,17 @@ $(BINDIR):
 %.c.o: %.c
 	$(RISCV_CC) $(RISCV_CCFLAGS) -c $< -o $@
 
+%.cpp.o: %.cpp
+	$(RISCV_CXX) $(RISCV_CXXFLAGS) -c $< -o $@
+
 $(BINDIR)/%.elf: %.S.o $(CRT0).o $(LIB_OBJS) | $(BINDIR)
-	$(RISCV_CC) -o $@ $^ $(RISCV_LDFLAGS) -T$(LINK)
+	$(RISCV_CC) -o $@ $^ $(RISCV_LDFLAGS) -T$(LINK) 
 
 $(BINDIR)/%.elf: %.c.o $(CRT0).o $(LIB_OBJS) | $(BINDIR)
 	$(RISCV_CC) -o $@ $^ $(RISCV_LDFLAGS) -T$(LINK)
+	
+$(BINDIR)/%.elf: %.cpp.o $(CRT0).o $(LIB_OBJS) | $(BINDIR)
+	$(RISCV_CXX) -o $@ $^ $(RISCV_LDFLAGS) -T$(LINK)
 
 $(BINDIR)/%.dump: $(BINDIR)/%.elf
 	$(RISCV_OBJDUMP) -D -s $< >$@

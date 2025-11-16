@@ -26,7 +26,11 @@ module croc_soc import croc_pkg::*; #(
 
   input  logic [GpioCount-1:0] gpio_i,       // Input from GPIO pins
   output logic [GpioCount-1:0] gpio_o,       // Output to GPIO pins
-  output logic [GpioCount-1:0] gpio_out_en_o // Output enable signal; 0 -> input, 1 -> output
+  output logic [GpioCount-1:0] gpio_out_en_o, // Output enable signal; 0 -> input, 1 -> output
+
+  output logic pjon_hw_o,
+  input  logic pjon_hw_i,
+  output logic pjon_hw_en_o
 );
 
   logic synced_rst_n, synced_fetch_en;
@@ -56,6 +60,10 @@ sbr_obi_rsp_t user_sbr_obi_rsp;
 // Connection between Croc_domain and User_domain: Croc Sbr, User Mgr
 mgr_obi_req_t user_mgr_obi_req;
 mgr_obi_rsp_t user_mgr_obi_rsp;
+mgr_obi_rsp_t user_mgr_idma_read_rsp;
+mgr_obi_rsp_t user_mgr_idma_write_rsp;
+mgr_obi_req_t user_mgr_idma_read_req;
+mgr_obi_req_t user_mgr_idma_write_req;
 
 logic [NumExternalIrqs-1:0] interrupts;
 logic [GpioCount-1:0] gpio_in_sync;
@@ -89,6 +97,10 @@ croc_domain #(
 
   .user_mgr_obi_req_i  ( user_mgr_obi_req ),
   .user_mgr_obi_rsp_o  ( user_mgr_obi_rsp ),
+  .user_mgr_idma_read_rsp_o ( user_mgr_idma_read_rsp),
+  .user_mgr_idma_write_rsp_o ( user_mgr_idma_write_rsp),
+  .user_mgr_idma_read_req_i ( user_mgr_idma_read_req),
+  .user_mgr_idma_write_req_i ( user_mgr_idma_write_req),
 
   .interrupts_i ( interrupts  ),
   .core_busy_o  ( status_o    )
@@ -107,9 +119,17 @@ user_domain #(
 
   .user_mgr_obi_req_o ( user_mgr_obi_req ),
   .user_mgr_obi_rsp_i ( user_mgr_obi_rsp ),
+  .user_mgr_idma_read_rsp_i ( user_mgr_idma_read_rsp),
+  .user_mgr_idma_write_rsp_i ( user_mgr_idma_write_rsp),
+  .user_mgr_idma_read_req_o ( user_mgr_idma_read_req),
+  .user_mgr_idma_write_req_o ( user_mgr_idma_write_req),
 
   .gpio_in_sync_i ( gpio_in_sync ),
-  .interrupts_o   ( interrupts   )
+  .interrupts_o   ( interrupts   ),
+
+  .pjon_hw_o      ( pjon_hw_o    ),
+  .pjon_hw_i      ( pjon_hw_i    ),
+  .pjon_hw_en_o   ( pjon_hw_en_o )
 );
 
 endmodule

@@ -56,6 +56,10 @@ void gpio_pin_set_output(uint8_t gpio_pin) {
     *reg32(GPIO_BASE_ADDR, GPIO_DIR_REG_OFFSET) |= (1 << gpio_pin);
 }
 
+void gpio_pin_set_input(uint8_t gpio_pin) {
+    *reg32(GPIO_BASE_ADDR, GPIO_DIR_REG_OFFSET) &= ~(1 << gpio_pin);
+}
+
 void gpio_pin_enable(uint8_t gpio_pin) {
     *reg32(GPIO_BASE_ADDR, GPIO_EN_REG_OFFSET) |= (1 << gpio_pin);
 }
@@ -66,6 +70,7 @@ void gpio_pin_disable(uint8_t gpio_pin) {
 
 void gpio_pin_set(uint8_t gpio_pin) {
     *reg32(GPIO_BASE_ADDR, GPIO_OUT_REG_OFFSET) |= (1 << gpio_pin);
+    gpio_pin_enable(gpio_pin); // ToDo: delete!
 }
 
 void gpio_pin_clear(uint8_t gpio_pin) {

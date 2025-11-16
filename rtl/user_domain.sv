@@ -16,11 +16,21 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
   input  sbr_obi_req_t user_sbr_obi_req_i, // User Sbr (rsp_o), Croc Mgr (req_i)
   output sbr_obi_rsp_t user_sbr_obi_rsp_o,
 
-  output mgr_obi_req_t user_mgr_obi_req_o, // User Mgr (req_o), Croc Sbr (rsp_i)
+  output mgr_obi_req_t user_mgr_obi_req_o,
   input  mgr_obi_rsp_t user_mgr_obi_rsp_i,
 
+  output mgr_obi_req_t user_mgr_idma_read_req_o, // User Mgr (req_o), Croc Sbr (rsp_i)
+  input  mgr_obi_rsp_t user_mgr_idma_read_rsp_i,
+  output mgr_obi_req_t user_mgr_idma_write_req_o, 
+  input  mgr_obi_rsp_t user_mgr_idma_write_rsp_i,
+
+
   input  logic [      GpioCount-1:0] gpio_in_sync_i, // synchronized GPIO inputs
-  output logic [NumExternalIrqs-1:0] interrupts_o // interrupts to core
+  output logic [NumExternalIrqs-1:0] interrupts_o, // interrupts to core
+
+  output logic pjon_hw_o,
+  input  logic pjon_hw_i,
+  output logic pjon_hw_en_o
 );
 
   assign interrupts_o = '0;  
@@ -46,6 +56,18 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
   sbr_obi_req_t [NumDemuxSbr-1:0] all_user_sbr_obi_req;
   sbr_obi_rsp_t [NumDemuxSbr-1:0] all_user_sbr_obi_rsp;
 
+  // ROM Subordinate Bus
+  sbr_obi_req_t user_rom_obi_req;
+  sbr_obi_rsp_t user_rom_obi_rsp;
+
+  // PJDL Subordinate Bus
+  sbr_obi_req_t user_pjdl_obi_req;
+  sbr_obi_rsp_t user_pjdl_obi_rsp;
+
+  // DMA Subordinate Bus
+  sbr_obi_req_t user_dma_obi_req;
+  sbr_obi_rsp_t user_dma_obi_rsp;
+
   // Error Subordinate Bus
   sbr_obi_req_t user_error_obi_req;
   sbr_obi_rsp_t user_error_obi_rsp;
@@ -53,7 +75,12 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
   // Fanout into more readable signals
   assign user_error_obi_req              = all_user_sbr_obi_req[UserError];
   assign all_user_sbr_obi_rsp[UserError] = user_error_obi_rsp;
-
+  assign user_rom_obi_req                = all_user_sbr_obi_req[UserRom];
+  assign all_user_sbr_obi_rsp[UserRom]   = user_rom_obi_rsp;
+  assign user_pjdl_obi_req               = all_user_sbr_obi_req[UserPJDL];
+  assign all_user_sbr_obi_rsp[UserPJDL]  = user_pjdl_obi_rsp;
+  assign user_dma_obi_req                = all_user_sbr_obi_req[UserDMA];
+  assign all_user_sbr_obi_rsp[UserDMA]   = user_dma_obi_rsp;
 
   //-----------------------------------------------------------------------------------------------
   // Demultiplex to User Subordinates according to address map
@@ -74,7 +101,7 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
     .dec_valid_o      (),
     .dec_error_o      (),
     .en_default_idx_i ( 1'b1 ),
-    .default_idx_i    ( '0   )
+    .default_idx_i    ( UserError )
   );
 
   obi_demux #(
@@ -99,6 +126,47 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
 //-------------------------------------------------------------------------------------------------
 // User Subordinates
 //-------------------------------------------------------------------------------------------------
+
+  // User ROM
+  user_rom #(
+    .ObiCfg      ( SbrObiCfg     ),
+    .obi_req_t   ( sbr_obi_req_t ),
+    .obi_rsp_t   ( sbr_obi_rsp_t )
+  ) i_user_rom (
+    .clk_i,
+    .rst_ni,
+    .obi_req_i  ( user_rom_obi_req ),
+    .obi_rsp_o  ( user_rom_obi_rsp )
+  );
+
+  // User PJDL
+  pjdl_wrap #(
+    .ObiCfg      ( SbrObiCfg     ),
+    .MgrObiCfg   ( MgrObiCfg     ),
+    .obi_req_t   ( sbr_obi_req_t ),
+    .obi_rsp_t   ( sbr_obi_rsp_t ),
+    .obi_mgr_req_t   ( mgr_obi_req_t ),
+    .obi_mgr_rsp_t   ( mgr_obi_rsp_t )
+  ) i_pjdl_wrap (
+    .clk_i,
+    .rst_ni,
+
+    .pjon_i     ( pjon_hw_i),
+    .pjon_o     ( pjon_hw_o),
+    .pjon_en_o  ( pjon_hw_en_o),
+
+    .obi_req_i  ( user_pjdl_obi_req ),
+    .obi_rsp_o  ( user_pjdl_obi_rsp ),
+
+    .obi_dma_req_i  ( user_dma_obi_req ),
+    .obi_dma_rsp_o  ( user_dma_obi_rsp ),
+
+    .obi_mgr_idma_read_req_o (  user_mgr_idma_read_req_o ),
+    .obi_mgr_idma_read_rsp_i ( user_mgr_idma_read_rsp_i ),
+
+    .obi_mgr_idma_write_req_o ( user_mgr_idma_write_req_o ),
+    .obi_mgr_idma_write_rsp_i ( user_mgr_idma_write_rsp_i )
+  );
 
   // Error Subordinate
   obi_err_sbr #(

@@ -38,6 +38,10 @@ module croc_domain import croc_pkg::*; #(
   /// User as manager (from user module to SRAM/peripherals)
   input  mgr_obi_req_t user_mgr_obi_req_i,
   output mgr_obi_rsp_t user_mgr_obi_rsp_o,
+  input  mgr_obi_req_t user_mgr_idma_read_req_i,
+  output mgr_obi_rsp_t user_mgr_idma_read_rsp_o,
+  input  mgr_obi_req_t user_mgr_idma_write_req_i,
+  output mgr_obi_rsp_t user_mgr_idma_write_rsp_o,
 
   input  logic [NumExternalIrqs-1:0] interrupts_i,
   output logic core_busy_o
@@ -325,8 +329,8 @@ module croc_domain import croc_pkg::*; #(
     .rst_ni,
     .testmode_i,
 
-    .sbr_ports_req_i  ( {core_instr_obi_req, core_data_obi_req, dbg_req_obi_req, user_mgr_obi_req_i } ), // from managers towards subordinates
-    .sbr_ports_rsp_o  ( {core_instr_obi_rsp, core_data_obi_rsp, dbg_req_obi_rsp, user_mgr_obi_rsp_o } ),
+    .sbr_ports_req_i  ( {core_instr_obi_req, core_data_obi_req, dbg_req_obi_req, user_mgr_obi_req_i, user_mgr_idma_read_req_i, user_mgr_idma_write_req_i } ), // from managers towards subordinates
+    .sbr_ports_rsp_o  ( {core_instr_obi_rsp, core_data_obi_rsp, dbg_req_obi_rsp, user_mgr_obi_rsp_o, user_mgr_idma_read_rsp_o, user_mgr_idma_write_rsp_o } ),
     .mgr_ports_req_o  ( all_sbr_obi_req ), // connections to subordinates
     .mgr_ports_rsp_i  ( all_sbr_obi_rsp ),
 

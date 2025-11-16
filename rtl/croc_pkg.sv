@@ -60,7 +60,7 @@ package croc_pkg;
   localparam bit [31:0]   PeriphAddrRange   = 32'h1000_0000;
 
   localparam bit [31:0]   SramBaseAddr      = 32'h1000_0000;
-  localparam int unsigned NumSramBanks      = 32'd2;
+  localparam int unsigned NumSramBanks      = 32'd8; // 8 (2k per Bank)
   localparam int unsigned SramBankNumWords  = 512;
   localparam int unsigned SramBankAddrWidth = cf_math_pkg::idx_width(SramBankNumWords);
   localparam int unsigned SramAddrRange     = NumSramBanks*SramBankNumWords*4;
@@ -70,7 +70,7 @@ package croc_pkg;
 
   localparam int unsigned NumCrocDomainSubordinates = 2 + NumSramBanks; // Peripherals + Memory + User Domain
   
-  localparam int unsigned NumXbarManagers = 4; // Debug module, Core Instr, Core Data, User Domain
+  localparam int unsigned NumXbarManagers = 6; // Debug module, Core Instr, Core Data, User Domain
   localparam int unsigned NumXbarSbrRules = NumCrocDomainSubordinates; // number of address rules in the decoder
   localparam int unsigned NumXbarSbr      = NumXbarSbrRules + 1; // additional OBI error, used for signal arrays
 

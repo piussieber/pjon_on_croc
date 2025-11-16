@@ -85,15 +85,78 @@ set floor_midpointY   [expr $floor_bottomY + ($floor_topY - $floor_bottomY)/2]
 
 utl::report "Place Macros"
 
-# Bank0
-set X [expr $floor_midpointX - $RamSize256x64_W/2]
-set Y [expr $floor_topY - $RamSize256x64_H]
+#All togheter in the upper right corner
+#Bank 0
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $floor_topY - $RamSize256x64_H - 15]
 placeInstance $bank0_sram0 $X $Y R0
 
-# Bank1
-set X [expr $X]
-set Y [expr $Y - $RamSize256x64_H - 15]
+#Bank 1
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $Y- $RamSize256x64_H - 30]
 placeInstance $bank1_sram0 $X $Y R0
 
+#Bank 2
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $Y- $RamSize256x64_H - 30]
+placeInstance $bank2_sram0 $X $Y R0
+
+#Bank 3
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $Y- $RamSize256x64_H - 30]
+placeInstance $bank3_sram0 $X $Y R0
+
+#Bank 4
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $floor_bottomY + 15]
+placeInstance $bank4_sram0 $X $Y R0
+
+#Bank 5
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $Y + $RamSize256x64_H + 30]
+placeInstance $bank5_sram0 $X $Y R0
+
+#Bank 6
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $Y + $RamSize256x64_H + 30]
+placeInstance $bank6_sram0 $X $Y R0
+
+#Bank 7
+set X [expr $floor_rightX - $RamSize256x64_W]
+set Y [expr $Y + $RamSize256x64_H + 30]
+placeInstance $bank7_sram0 $X $Y R0
+
+
+
+#Double Pack Ring Placement
+# Bank0
+#set X [expr $floor_midpointX - $RamSize256x64_W/2]
+#set Y [expr $floor_topY - $RamSize256x64_H]
+#placeInstance $bank0_sram0 $X $Y R0
+
+# Bank1
+#set X [expr $X]
+#set Y [expr $Y - $RamSize256x64_H - 15]
+#placeInstance $bank1_sram0 $X $Y R0
+
+#Bank2
+#set X [expr $X]
+#set Y [expr $floor_bottomY]
+#placeInstance $bank2_sram0 $X $Y R0
+
+#Bank3
+#set X [expr $X]
+#set Y [expr $Y + $RamSize256x64_H + 15]
+#placeInstance $bank3_sram0 $X $Y R0
+
+#Bank4
+#set X [expr $floor_rightX -$RamSize256x64_H]
+#set Y [expr $floor_midpointY - $RamSize256x64_W/2]
+#placeInstance $bank4_sram0 $X $Y R90
+
+#Bank5
+#set X [expr $X - $RamSize256x64_H - 15]
+#set Y [expr $Y]
+#placeInstance $bank5_sram0 $X $Y R90
 
 cut_rows -halo_width_x 2 -halo_width_y 1

@@ -14,6 +14,7 @@ OPENROAD  ?= openroad
 KLAYOUT   ?= klayout
 VSIM      ?= vsim
 REGGEN    ?= $(PYTHON3) $(shell $(BENDER) path register_interface)/vendor/lowrisc_opentitan/util/regtool.py
+IDMA_ROOT ?= $(shell $(BENDER) path idma)
 
 # Directories
 # directory of the path to the last called Makefile (this one)
@@ -48,9 +49,9 @@ clean-deps:
 ############
 # Software #
 ############
-SW_HEX := sw/bin/helloworld.hex
+SW_HEX := sw/bin/pjon_test.hex
 
-$(SW_HEX): sw/*.c sw/*.h sw/*.S sw/*.ld
+$(SW_HEX): sw/*.cpp sw/*.h sw/*.S sw/*.ld
 	$(MAKE) -C sw/ compile
 
 ## Build all top-level programs in sw/
@@ -68,10 +69,12 @@ VLOG_ARGS  = -svinputport=compat
 VSIM_ARGS  = -t 1ns -voptargs=+acc
 VSIM_ARGS += -suppress vsim-3009 -suppress vsim-8683 -suppress vsim-8386
 
-vsim/compile_rtl.tcl: Bender.lock Bender.yml
+include $(IDMA_ROOT)/idma.mk
+
+vsim/compile_rtl.tcl: Bender.lock Bender.yml $(IDMA_FULL_RTL)
 	$(BENDER) script vsim -t rtl -t vsim -t simulation -t verilator -DSYNTHESIS -DSIMULATION  --vlog-arg="$(VLOG_ARGS)" > $@
 
-vsim/compile_netlist.tcl: Bender.lock Bender.yml
+vsim/compile_netlist.tcl: Bender.lock Bender.yml $(IDMA_FULL_RTL)
 	$(BENDER) script vsim -t ihp13 -t vsim -t simulation -t verilator -t netlist_yosys -DSYNTHESIS -DSIMULATION > $@
 
 ## Simulate RTL using Questasim/Modelsim/vsim
@@ -93,7 +96,7 @@ VERILATOR_ARGS = -Wno-fatal -Wno-style \
 	-Wno-BLKANDNBLK -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC -Wno-WIDTHCONCAT -Wno-ASCRANGE
 
 VERILATOR_ARGS += --binary -j 0
-VERILATOR_ARGS += --timing --autoflush --trace-fst --trace-threads 2 --trace-structs
+VERILATOR_ARGS += --timing --autoflush --trace-fst --trace-threads 2 --trace-depth 3 --trace-structs
 VERILATOR_ARGS +=  --unroll-count 1 --unroll-stmts 1
 VERILATOR_ARGS += --x-assign fast --x-initial fast
 VERILATOR_CFLAGS += -O3 -march=native -mtune=native
@@ -126,6 +129,7 @@ yosys-flist: Bender.lock Bender.yml rtl/*/Bender.yml
 
 include yosys/yosys.mk
 include openroad/openroad.mk
+include vivado/vivado.mk
 
 klayout/croc_chip.gds: $(OR_OUT)/croc.def klayout/*.sh klayout/*.py
 	./klayout/def2gds.sh
