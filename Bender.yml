@@ -19,9 +19,9 @@ dependencies:
   timer_unit:           { git: "https://github.com/pulp-platform/timer_unit.git",           version: 1.0.3  }
   obi:                  { git: "https://github.com/pulp-platform/obi.git",                  version: 0.1.7  }
   obi_peripherals:      { git: "https://github.com/pulp-platform/obi_peripherals.git",      rev: 21ee04d    } # UART
-  pjon_hw:              { git: "https://github.com/piussieber/PJON_HW.git",                 rev: "pjon_addressing"}
+  pjon_hw:              { git: "https://github.com/piussieber/PJON_HW.git",                 rev: "main"     }
   cve2:                 { path: "rtl/cve2" } # a vendor package (no Bender.yml), see below 
-  idma:                 { git: "git@gitlab.ethz.ch:pjon-on-croc/idma_axis_obi",             rev: "main"      }
+  idma:                 { git: "https://github.com/piussieber/iDMA_axis_obi.git",           rev: "master"   }
 
 
 sources:

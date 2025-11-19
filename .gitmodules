@@ -3,4 +3,4 @@
 	url = https://github.com/IHP-GmbH/IHP-Open-PDK
 [submodule "sw/lib/inc/PJON"]
 	path = sw/lib/inc/PJON
-	url = git@gitlab.ethz.ch:pjon-on-croc/pjon.git
+	url = https://github.com/piussieber/pjon_on_croc_sw

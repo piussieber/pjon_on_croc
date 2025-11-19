@@ -43,10 +43,10 @@ packages:
       Path: rtl/cve2
     dependencies: []
   idma:
-    revision: 62e5e4fb7296a2ad021d9a45f93fdae416f93cdb
+    revision: 5ba37acb3437788f8800f8afcb7ac256ecb46479
     version: null
     source:
-      Git: git@gitlab.ethz.ch:pjon-on-croc/idma_axis_obi
+      Git: https://github.com/piussieber/iDMA_axis_obi.git
     dependencies:
     - axi
     - axi_stream
@@ -71,7 +71,7 @@ packages:
     - common_cells
     - obi
   pjon_hw:
-    revision: 84abcd22735792b9c10b69fa9e88a7ac77589078
+    revision: 9324264a163dba4f347573f2f796d3bac9493e19
     version: null
     source:
       Git: https://github.com/piussieber/PJON_HW.git
