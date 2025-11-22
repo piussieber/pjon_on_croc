@@ -1,4 +1,4 @@
-<img src="doc/artwork/PJONonCROC_Logo.svg" alt="PJONonCROC">
+<img src="doc/artwork/PJONonCROC_Logo.svg" alt="PJONonCROC"  width="150" height="150">
 
 # PJON on CROC
 This fork of the [CROC-Chip](https://github.com/pulp-platform/croc) integrates the [PJDL-HW](https://github.com/piussieber/PJON_HW)-module into the processor.\
@@ -6,84 +6,7 @@ The goal of the project was to show how a hardware implementation of [PJDL](http
 
 This chip was designed as part of my bachelors project at [ETH Zurich](https://ethz.ch/de.html). It was therafter finalized for production in collaboration with Julian Lehmann as part of the VLSI design course at ETH Zurich.
 
-
-## Architecture
-
-![Croc block diagram](doc/croc_arch.svg)
-
-The SoC is composed of two main parts:
-- The `croc_domain` containing a CVE2 core (a fork of Ibex), SRAM, an OBI crossbar and a few simple peripherals 
-- The `user_domain` where students are invited to add their own designs or other open-source designs (peripherals, accelerators...)
-
-The main interconnect is OBI, you can find [the spec online](https://github.com/openhwgroup/obi/blob/072d9173c1f2d79471d6f2a10eae59ee387d4c6f/OBI-v1.6.0.pdf). 
-
-The various IPs of the SoC (UART, OBI, debug-module, timer...) come from other PULP repositories and are managed by [Bender](https://github.com/pulp-platform/bender).
-To make it easier to browse and understand, only the currently used files are included in `rtl/<IP>`. You may want to explore the repositories of the respective IPs to find their documentation or additional functionality, the urls are in `Bender.yml`.
-
-## Configuration
-
-The main SoC configurations are in `rtl/croc_pkg.sv`:
-
-| Parameter           | Default          | Function                                              |
-|---------------------|------------------|-------------------------------------------------------|
-| `HartId`            | `0`              | Core's Hart ID                                        |
-| `PulpJtagIdCode`    | `32'hED9_C0C50`  | Debug module ID code                                  |
-| `NumExternalIrqs`   | `4`              | Number of external interrupts into Croc domain        |
-| `BankNumWords`      | `512`            | Number of 32bit words in a memory bank                |
-| `NumSramBanks`      | `2`              | Number of memory banks                                |
-
-The SRAMs are instantiated via a technology wrapper called `tc_sram_impl` (tc: tech_cells), the technology-independent implementation is in `rtl/tech_cells_generic/tc_sram_impl.sv`. A number of SRAM configurations are implemented using IHP130 SRAM memories in `ihp13/tc_sram_impl.sv`. If an unimplemented SRAM configuration is instantiated it will result in a `tc_sram_blackbox` module which can then be easily identified from the synthesis results.
-
-## Bootmodes
-
-Currently the only way to boot is via JTAG.
-
-## Memory Map
-
-If possible, the memory map should remain compatible with [Cheshire's memory map](https://pulp-platform.github.io/cheshire/um/arch/#memory-map).  
-Further each new subordinate should occupy multiples of 4KB of the address space (`32'h0000_1000`).
-
-The address map of the default configuration is as follows:
-
-| Start Address   | Stop Address    | Description                                |
-|-----------------|-----------------|--------------------------------------------|
-| `32'h0000_0000` | `32'h0004_0000` | Debug module (JTAG)                        |
-| `32'h0300_0000` | `32'h0300_1000` | SoC control/info registers                 |
-| `32'h0300_2000` | `32'h0300_3000` | UART peripheral                            |
-| `32'h0300_5000` | `32'h0300_6000` | GPIO peripheral                            |
-| `32'h0300_A000` | `32'h0300_B000` | Timer peripheral                           |
-| `32'h1000_0000` | `+SRAM_SIZE`    | Memory banks (SRAM)                        |
-| `32'h2000_0000` | `32'h8000_0000` | Passthrough to user domain                 |
-| `32'h2000_0000` | `32'h2000_1000` | reserved for string formatted user ROM*    |
-
-
-*If people modify Croc we suggest they add a ROM at this address containing additional information 
-like the names of the developers, a project link or similar. This can then be written out via UART.  
-We ask people to format the ROM like a C string with zero termination and using ASCII encoding if feasible.  
-The [MLEM user ROM](https://github.com/pulp-platform/croc/blob/mlem-tapeout/rtl/user_domain/user_rom.sv) may serve as a reference implementation.
-
-## Flow
-```mermaid
-graph LR;
-	Bender-->Yosys;
-	Yosys-->OpenRoad;
-	OpenRoad-->KLayout;
-```
-1. Bender provides a list of SystemVerilog files
-2. Yosys parses, elaborates, optimizes and maps the design to the technology cells
-3. The netlist, constraints and floorplan are loaded into OpenRoad for Place&Route
-4. The design as def is read by klayout and the geometry of the cells and macros are merged
-
-Currently, the final GDS is still missing the following things:
-- metal density fill
-- sealring
-These can be added in KLayout, check the [IHP repository](https://github.com/IHP-GmbH/IHP-Open-PDK/tree/main) (possible the dev branch) for a reference script.
-
-### Example Results
-Cell/Module placement                      |  Routing
-:-----------------------------------------:|:------------------------------------:
-![Chip module view](doc/croc_modules.jpg)  |  ![Chip routed](doc/croc_routed.jpg)
-
+This file only describes the changes made as part of the pjon on croc project. For more documentation about croc itself, please refer its repository: [CROC](https://github.com/pulp-platform/croc)
 
 ## Requirements
 We are using the excellent docker container maintained by Harald Pretl. If you get stuck with installing the tools, we urge you to check the [Tool Repository](https://github.com/iic-jku/IIC-OSIC-TOOLS).  
@@ -173,17 +96,6 @@ The most important make targets are documented, you can list them with:
 ```sh
 make help
 ```
-
-### Building on Croc
-To add your own design, we recommend creating a new directory under `rtl/` or put single source files (small designs) into `rtl/user_domain`, then go into `Bender.yml` and add the files in the indicated places.
-This will make Bender aware of the files and any script it contains will contain your design as well.
-
-Then re-generate the default synthesis file-list:
-```sh
-make yosys-flist
-```
-
-If you want to add an existing design and it already containts a `Bender.yml` in its repository, you can add it as a dependency in the `Bender.yml` and reading the guide below.
 
 ## Bender
 The dependency manager [Bender](https://github.com/pulp-platform/bender) is used in most pulp-platform IPs.
