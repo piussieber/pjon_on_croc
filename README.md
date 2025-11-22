@@ -8,6 +8,20 @@ This chip was designed as part of my bachelors project at [ETH Zurich](https://e
 
 This file only describes the changes made as part of the pjon on croc project. For more documentation about croc itself, please refer its repository: [CROC](https://github.com/pulp-platform/croc)
 
+## Architecture
+The main part of this project is the PJDL module. This module is the actual hardware implementation of the PJDL interface. The PJDL module is then integrated into the user space of Croc, inside a wrap together with the necessary additional modules. The whole implementation of Croc with the PJDL module in the user space can be seen in the following block schematic:
+<img src="doc/Block-Schematic_Croc_Overview.svg" alt="Croc Block-Schematic"  height="200">
+This block schematic should give a rough overview over the system. Not all connections and modules are shown, to make it easier to understand. Each element will be explained in more detail later on.
+
+### PJDL-Module
+This module implements the core functionality of the PJDL serial communication. The PJDL module consists of two different submodules, one for receiving and one for sending. They are interconnected such that only one of them is running at the time. This is done such that receiving the own data is prevented. The module also controls the following outputs and inputs:
+`pjon_o`, `pjon_en_o`, `pjon_i`. Where `pjon_o` and `pjon_i` are the output and input ports of the PJDL. They can be combined to a single port. pjon_en_o indicates if the module wants to send data. For more in-depth documentation see the repository of the [PJDL-HW](https://github.com/piussieber/PJON_HW)-module.
+
+
+(following: some important parts from the original croc documentation)
+
+----------
+
 ## Requirements
 We are using the excellent docker container maintained by Harald Pretl. If you get stuck with installing the tools, we urge you to check the [Tool Repository](https://github.com/iic-jku/IIC-OSIC-TOOLS).  
 The current supported version is 2025.03, no other version is officially supported.
