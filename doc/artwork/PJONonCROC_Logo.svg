@@ -4,13 +4,20 @@
 <svg
    version="1.1"
    id="svg1"
-   width="410.72995"
-   height="374.09415"
-   viewBox="0 0 410.72998 374.09416"
+   width="410.72998"
+   height="374.60312"
+   viewBox="0 0 410.73001 374.60313"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1" />
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.73305"
+     id="rect1"
+     width="409.72217"
+     height="374.60312"
+     x="4.8236266e-06"
+     y="0" />
   <g
      id="g1"
      transform="translate(-342.14817,-437.51326)">
