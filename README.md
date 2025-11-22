@@ -88,3 +88,6 @@ After the start of the transfer, the most important register is the "transfer do
 Apart from our three main iDMA Modules, there are four additional modules located within the iDMA-wrap. Two of them are simple interface adapters needed for the manager obi interface, as the obi-interface types used by the backend are not the same as the one used by the rest of Croc. The other two modules are up- and downsizer for the AXI stream. They are needed as our obi interface has a width of 32bits. To make transfers as efficient as possible, the iDMA module copies 32bits at a time, which thereafter have to be resized to be connected to the PJDL module.
 
 
+
+## License
+Unless specified otherwise in the respective file headers, all code checked into this repository is made available under a permissive license. All hardware sources and tool scripts are licensed under the Solderpad Hardware License 0.51 (see `LICENSE.md`). All software sources are licensed under Apache 2.0.
