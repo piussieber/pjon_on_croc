@@ -1,17 +1,10 @@
-# Croc System-on-Chip
+<img src="doc/artwork/PJONonCROC_Logo.svg" alt="PJONonCROC">
 
-A simple SoC for education using PULP IPs. Croc includes all scripts necessary to produce a nearly finished chip in [IHPs open-source 130nm technology](https://github.com/IHP-GmbH/IHP-Open-PDK/tree/main).
+# PJON on CROC
+This fork of the [CROC-Chip](https://github.com/pulp-platform/croc) integrates the [PJDL-HW](https://github.com/piussieber/PJON_HW)-module into the processor.\
+The goal of the project was to show how a hardware implementation of [PJDL](https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/specification/PJDL-specification-v5.0.md) helps to increase the processors efficiency by moving all the direct sending and receiving tasks from software to hardware.  PJDL is a single-wire data link protocol and belongs to the [PJON](https://github.com/gioblu/PJON) network protocol. With the implementation of all the receiving logic in hardware, packet loss is also minimized as the hardware can listen on the bus at all times, also when the CPU is busy doing other things.
 
-As it is oriented towards education, it forgoes some configurability to increase readability of the RTL and scripts.
-
-Croc is developed as part of the PULP project, a joint effort between ETH Zurich and the University of Bologna.
-
-Croc was successfully taped out in Nov 2024. The chip is called [MLEM](http://asic.ee.ethz.ch/2024/MLEM.html), named after the sound Yoshi makes when eating a tasty fruit.
-MLEM was designed and prepared for tapeout by ETHZ students as a bachelor project. The exact code and scripts used for the tapeout can be seen in the frozen [mlem-tapeout](https://github.com/pulp-platform/croc/tree/mlem-tapeout) branch.
-
-
-**IMPORTANT: Update to 1.1 recommended.**  
-Release 1.1 and newer includes a fix for the SRAMs where the `A_DLY` pin was tied low instead of high. The pin controls internal timings and the old version may create violations for some SRAMs.  
+This chip was designed as part of my bachelors project at [ETH Zurich](https://ethz.ch/de.html). It was therafter finalized for production in collaboration with Julian Lehmann as part of the VLSI design course at ETH Zurich.
 
 
 ## Architecture
