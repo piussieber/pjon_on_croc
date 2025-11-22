@@ -1,7 +1,7 @@
 <img src="doc/artwork/PJONonCROC_Logo.svg" alt="PJONonCROC"  width="150" height="150">
 
 # PJON on CROC
-This fork of the [CROC-Chip](https://github.com/pulp-platform/croc) integrates the [PJDL-HW](https://github.com/piussieber/PJON_HW)-module into the processor.\
+This fork of the [CROC-Chip](https://github.com/pulp-platform/croc) integrates the [PJDL-module](https://github.com/piussieber/PJON_HW) into the processor.\
 The goal of the project was to show how a hardware implementation of [PJDL](https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/specification/PJDL-specification-v5.0.md) helps to increase the processors efficiency by moving all the direct sending and receiving tasks from software to hardware.  PJDL is a single-wire data link protocol and belongs to the [PJON](https://github.com/gioblu/PJON) network protocol. With the implementation of all the receiving logic in hardware, packet loss is also minimized as the hardware can listen on the bus at all times, also when the CPU is busy doing other things.
 
 This chip was designed as part of my bachelors project at [ETH Zurich](https://ethz.ch/de.html). It was therafter finalized for production in collaboration with Julian Lehmann as part of the VLSI design course at ETH Zurich.
@@ -9,14 +9,17 @@ This chip was designed as part of my bachelors project at [ETH Zurich](https://e
 This file only describes the changes made as part of the pjon on croc project. For more documentation about croc itself, please refer its repository: [CROC](https://github.com/pulp-platform/croc)
 
 ## Architecture
-The main part of this project is the PJDL module. This module is the actual hardware implementation of the PJDL interface. The PJDL module is then integrated into the user space of Croc, inside a wrap together with the necessary additional modules. The whole implementation of Croc with the PJDL module in the user space can be seen in the following block schematic:
-<img src="doc/Block-Schematic_Croc_Overview.svg" alt="Croc Block-Schematic"  height="200">
+The main part of this project is the PJDL module. This module is the actual hardware implementation of the PJDL interface. The PJDL module is then integrated into the user space of Croc, inside a wrap together with the necessary additional modules. The whole implementation of Croc with the PJDL module in the user space can be seen in the following block schematic:\
+<img src="doc/Block-Schematic_Croc_Overview.svg" alt="Croc Block-Schematic">\
 This block schematic should give a rough overview over the system. Not all connections and modules are shown, to make it easier to understand. Each element will be explained in more detail later on.
 
 ### PJDL-Module
 This module implements the core functionality of the PJDL serial communication. The PJDL module consists of two different submodules, one for receiving and one for sending. They are interconnected such that only one of them is running at the time. This is done such that receiving the own data is prevented. The module also controls the following outputs and inputs:
-`pjon_o`, `pjon_en_o`, `pjon_i`. Where `pjon_o` and `pjon_i` are the output and input ports of the PJDL. They can be combined to a single port. pjon_en_o indicates if the module wants to send data. For more in-depth documentation see the repository of the [PJDL-HW](https://github.com/piussieber/PJON_HW)-module.
+`pjon_o`, `pjon_en_o`, `pjon_i`. Where `pjon_o` and `pjon_i` are the output and input ports of the PJDL. They can be combined to a single port. pjon_en_o indicates if the module wants to send data. For more in-depth documentation see the repository of the [PJON-HW](https://github.com/piussieber/PJON_HW) repository.
 
+### PJON-Addressing
+The purpose of the PJON-Addressing module is to filter out data that is not meant for the current device. In PJON networks with a lot of devices this can increase the performance significantly.\
+This module is also part of the PJON-HW repository and its documentation can also be found [there](https://github.com/piussieber/PJON_HW#pjon-addressing). 
 
 (following: some important parts from the original croc documentation)
 
